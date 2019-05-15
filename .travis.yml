@@ -1,0 +1,22 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t terranup16/udemy-fib-react-test -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run terranup16/udemy-fib-react-test npm test
+
+after_success:
+  - docker build -t terranup16/udemy-fib-client ./client
+  - docker build -t terranup16/udemy-fib-nginx ./nginx
+  - docker build -t terranup16/udemy-fib-server ./server
+  - docker build -t terranup16/udemy-fib-worker ./worker
+  # Login to the Docker CLI
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  # Take those images and push them to Docker Hub
+  - docker push terranup16/udemy-fib-client
+  - docker push terranup16/udemy-fib-nginx
+  - docker push terranup16/udemy-fib-server
+  - docker push terranup16/udemy-fib-worker
